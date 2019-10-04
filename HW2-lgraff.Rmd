@@ -13,6 +13,9 @@ require(leaflet.extras)
 require(dplyr)
 require(readxl)
 require(stringr)
+
+require(raptr)
+require(PBSmapping)
 ```
 
 ## Load shapefile
@@ -35,6 +38,25 @@ leaflet() %>%
 
   #addPolygons(data = FL_16, weight = 1)
 ```
+
+```{r}
+
+# Caculate centroids of counties to find lat and long
+FL_polyset <- SpatialPolygons2PolySet(x = FL_16)
+head(latlong)
+centroid <- calcCentroid(FL_polyset, rollup = 1)
+
+# Bind county centroids to Florida data
+df_FL <- cbind(FL_16@data, centroid)
+
+# Map with circle markers, radius defined by median gross rent
+leaflet(df_FL) %>%
+  addProviderTiles(providers$OpenStreetMap) %>% 
+  addCircleMarkers(lat = ~Y, lng = ~X, 
+                   radius = ~(mgr.16)^(.25),
+                   popup = ~mgr.16) 
+```
+
 
 ## Including Plots
 
