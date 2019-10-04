@@ -16,9 +16,24 @@ require(stringr)
 ```
 
 ## Load shapefile
-```{r cars}
+
+```{r }
 FL_counties <- readOGR("FL_eviction_counties.geojson")
 plot(FL_counties)
+
+# Select a subset of columns
+FL_16 <- FL_counties
+FL_16@data <- FL_16@data %>% 
+  select(GEOID, west, south, north, n, pl, pr.16, mgr.16, mpv.16, e.16, er.16)
+```
+
+## Basemap
+
+```{r basemap}
+leaflet() %>%
+  addProviderTiles(providers$OpenStreetMap)  
+
+  #addPolygons(data = FL_16, weight = 1)
 ```
 
 ## Including Plots
