@@ -49,12 +49,14 @@ centroid <- calcCentroid(FL_polyset, rollup = 1)
 # Bind county centroids to Florida data
 df_FL <- cbind(FL_16@data, centroid)
 
-# Map with circle markers, radius defined by median gross rent
+# Map with circle markers, radius defined by median gross rent2
 leaflet(df_FL) %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
   addCircleMarkers(lat = ~Y, lng = ~X, 
                    radius = ~(mgr.16)^(.25),
                    popup = ~mgr.16) 
+
+# Test
 ```
 
 
