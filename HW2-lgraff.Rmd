@@ -20,7 +20,7 @@ require(PBSmapping)
 
 ## Load shapefile
 
-```{r }
+```{r shapefile}
 # Load FL eviction data. Source: https://data-downloads.evictionlab.org/
 FL_counties <- readOGR("FL_eviction_counties.geojson")
 plot(FL_counties)
@@ -29,7 +29,7 @@ plot(FL_counties)
 # poverty rate, median gross rent, median property value, num of evictions, eviction rate
 FL_16 <- FL_counties
 FL_16@data <- FL_16@data %>% 
-  select(GEOID, west, south, north, n, pl, pr.16, mgr.16, mpv.16, e.16, er.16)
+  dplyr::select(GEOID, west, south, north, n, pl, pr.16, mgr.16, mpv.16, e.16, er.16)
 ```
 
 ## Basemap
@@ -73,7 +73,7 @@ leaflet() %>%
   
 ```
 
-# Create plain polygons map with no additions
+# Plain polygons map with no additions
 ```{r}
 # Map with layer of polygons, no additions
 leaflet() %>% 
@@ -82,7 +82,7 @@ leaflet() %>%
 ```
 
 
-# Add polygons colored by median gross rent
+# Polygons colored by median gross rent
 ```{r polygons}
 # Make color palette for median gross rent (mgr)
 bins <- c(500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400)
@@ -100,7 +100,6 @@ leaflet() %>%
 ```
 
 # Add layersControl with two basemaps and two different layers
-# Include quantile color palette by number of median property value
 ```{r layersControl}
 
 # Create a palette for MPV and evictions
@@ -111,10 +110,11 @@ qpal_Evic <- colorQuantile("Reds", df_FL$e.16, n = 5, na.color = "white")
 leaflet() %>%
   addProviderTiles(providers$OpenStreetMap, group = "Open Street") %>% 
   addProviderTiles(providers$Esri.WorldStreetMap, group = "Esri World Street") %>% 
-  addLayersControl(
-    baseGroups = c("Open Street", "Esri World Street"),
-    options = layersControlOptions(collapsed = FALSE)
-  ) %>% 
+  
+  #addLayersControl(
+   # baseGroups = c("Open Street", "Esri World Street"),
+  #  options = layersControlOptions(collapsed = FALSE)
+  #) %>% 
 
   # Median Property Value polygons
   addPolygons(data = FL_16, weight = 1,
@@ -134,6 +134,7 @@ leaflet() %>%
   
   # Layers control for polygons
   addLayersControl(overlayGroups = c("Median Property Value", "Evictions"),
+                   c("Open Street", "Esri World Street"),
                    options = layersControlOptions(collapsed = F)) %>% 
   
   # Make "Evictions" default selection 
