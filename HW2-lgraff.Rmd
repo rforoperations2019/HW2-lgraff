@@ -21,6 +21,7 @@ require(PBSmapping)
 ## Load shapefile
 
 ```{r }
+# Load FL eviction data. Source: https://data-downloads.evictionlab.org/
 FL_counties <- readOGR("FL_eviction_counties.geojson")
 plot(FL_counties)
 
@@ -40,7 +41,7 @@ leaflet() %>%
   #addPolygons(data = FL_16, weight = 1)
 ```
 
-# Map with markers
+# Map with marker points
 ```{r points}
 
 # Calculate centroids of counties to find lat and long
@@ -51,7 +52,7 @@ centroid <- calcCentroid(FL_polyset, rollup = 1)
 df_FL <- cbind(FL_16@data, centroid)
 
 # Map with circle markers, radius defined by poverty rate
-# Include a popup that lists the county's poverty rate
+# Include a popup that lists the county's poverty rate (%)
 leaflet() %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
   addPolygons(data = FL_16, weight = 1) %>% 
@@ -62,6 +63,7 @@ leaflet() %>%
 
 ```
 
+# Map with layer of lines
 ```{r lines}
 
 # Map with layer of lines
@@ -91,7 +93,7 @@ leaflet() %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
   addPolygons(data = FL_16, weight = 1,
               fillColor = ~pal(mgr.16),
-              fillOpacity = 0.8, group = "lindsay") %>% 
+              fillOpacity = 0.8) %>% 
   addLegend(title = "Median Gross Rent", pal = pal, values = FL_16@data$mgr.16,
             labFormat = labelFormat(prefix = "$"), opacity = 1)
 
