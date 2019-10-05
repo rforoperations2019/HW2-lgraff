@@ -54,8 +54,8 @@ leaflet() %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
   addPolygons(data = FL_16, weight = 1) %>% 
   addCircleMarkers(data = df_FL, lat = ~Y, lng = ~X, 
-                   radius = ~(mgr.16)^(.15),
-                   popup = ~mgr.16,
+                   radius = ~pvr.16,
+                   popup = ~pvr.16,
                    color = "red") 
 
 ```
@@ -80,18 +80,30 @@ leaflet() %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
   addPolygons(data = FL_16, weight = 1,
               fillColor = ~pal(mgr.16),
-              fillOpacity = 0.8)
+              fillOpacity = 0.8) %>% 
+  addLegend(pal = pal, values = FL_16@data$mgr.16,
+            labFormat = labelFormat(prefix = "$"))
 
 ```
 
+# Add layersControl with two basemaps and two different layers
+# Include quantile color palette by number of median property value
+```{r layersControl}
 
+# Create a continuous palette function
+qpal <- colorQuantile("Blues", df_FL$mpv.16, n = 5)
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+leaflet() %>%
+  addProviderTiles(providers$OpenStreetMap, group = "Open Street") %>% 
+  addProviderTiles(providers$Esri.WorldStreetMap, group = "Esri World Street") %>% 
+  addLayersControl(
+    baseGroups = c("Open Street", "Esri World Street"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>% 
+  addPolygons(data = FL_16, weight = 1,
+              smoothFactor = .2,
+              fillOpacity = .8,
+              fillColor = ~qpal(df_FL$mpv.16)) %>% 
+  addLegend(pal = qpal, values = df_FL$mpv.16)
+  
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
