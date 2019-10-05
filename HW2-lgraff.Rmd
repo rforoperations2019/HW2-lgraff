@@ -39,9 +39,9 @@ leaflet() %>%
   #addPolygons(data = FL_16, weight = 1)
 ```
 
-```{r}
+```{r points}
 
-# Caculate centroids of counties to find lat and long
+# Calculate centroids of counties to find lat and long
 FL_polyset <- SpatialPolygons2PolySet(x = FL_16)
 head(latlong)
 centroid <- calcCentroid(FL_polyset, rollup = 1)
@@ -50,14 +50,40 @@ centroid <- calcCentroid(FL_polyset, rollup = 1)
 df_FL <- cbind(FL_16@data, centroid)
 
 # Map with circle markers, radius defined by median gross rent2
-leaflet(df_FL) %>%
+leaflet() %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
-  addCircleMarkers(lat = ~Y, lng = ~X, 
-                   radius = ~(mgr.16)^(.25),
-                   popup = ~mgr.16) 
+  addPolygons(data = FL_16, weight = 1) %>% 
+  addCircleMarkers(data = df_FL, lat = ~Y, lng = ~X, 
+                   radius = ~(mgr.16)^(.15),
+                   popup = ~mgr.16,
+                   color = "red") 
 
-# Test
 ```
+
+```{r lines}
+
+# Map with layer of lines
+leaflet() %>% 
+  addProviderTiles(providers$OpenStreetMap) %>% 
+  addPolylines(data = FL_16, weight = 1) 
+  
+```
+
+# Add polygons colored by median gross rent
+```{r polygons}
+# Make color palette for median gross rent (mgr)
+bins <- c(500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400)
+pal <- colorBin("YlOrRd", domain = df_FL$mgr.16, bins = bins)
+
+# Map with layer of polygons, colored by mgr
+leaflet() %>% 
+  addProviderTiles(providers$OpenStreetMap) %>% 
+  addPolygons(data = FL_16, weight = 1,
+              fillColor = ~pal(mgr.16),
+              fillOpacity = 0.8)
+
+```
+
 
 
 ## Including Plots
