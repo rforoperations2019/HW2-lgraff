@@ -71,6 +71,15 @@ leaflet() %>%
   
 ```
 
+# Create plain polygons map with no additions
+```{r}
+# Map with layer of polygons, no additions
+leaflet() %>% 
+  addProviderTiles(providers$OpenStreetMap) %>% 
+  addPolygons(data = FL_16, weight = 1)
+```
+
+
 # Add polygons colored by median gross rent
 ```{r polygons}
 # Make color palette for median gross rent (mgr)
