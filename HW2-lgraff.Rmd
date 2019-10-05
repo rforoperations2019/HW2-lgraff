@@ -25,6 +25,7 @@ FL_counties <- readOGR("FL_eviction_counties.geojson")
 plot(FL_counties)
 
 # Select a subset of columns
+# poverty rate, median gross rent, median property value, num of evictions, eviction rate
 FL_16 <- FL_counties
 FL_16@data <- FL_16@data %>% 
   select(GEOID, west, south, north, n, pl, pr.16, mgr.16, mpv.16, e.16, er.16)
@@ -39,23 +40,24 @@ leaflet() %>%
   #addPolygons(data = FL_16, weight = 1)
 ```
 
+# Map with markers
 ```{r points}
 
 # Calculate centroids of counties to find lat and long
 FL_polyset <- SpatialPolygons2PolySet(x = FL_16)
-head(latlong)
 centroid <- calcCentroid(FL_polyset, rollup = 1)
 
 # Bind county centroids to Florida data
 df_FL <- cbind(FL_16@data, centroid)
 
-# Map with circle markers, radius defined by median gross rent2
+# Map with circle markers, radius defined by poverty rate
+# Include a popup that lists the county's poverty rate
 leaflet() %>%
   addProviderTiles(providers$OpenStreetMap) %>% 
   addPolygons(data = FL_16, weight = 1) %>% 
   addCircleMarkers(data = df_FL, lat = ~Y, lng = ~X, 
-                   radius = ~pvr.16,
-                   popup = ~pvr.16,
+                   radius = ~log(pr.16),
+                   popup = ~as.character(pr.16),
                    color = "red") 
 
 ```
@@ -93,6 +95,7 @@ leaflet() %>%
 # Create a continuous palette function
 qpal <- colorQuantile("Blues", df_FL$mpv.16, n = 5)
 
+# Create two basemaps with layers control. Color the map by quantile of median property value
 leaflet() %>%
   addProviderTiles(providers$OpenStreetMap, group = "Open Street") %>% 
   addProviderTiles(providers$Esri.WorldStreetMap, group = "Esri World Street") %>% 
